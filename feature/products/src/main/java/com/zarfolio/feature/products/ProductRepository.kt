@@ -24,6 +24,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 interface ProductRepository {
     suspend fun search(query: ProductSearchQuery): ApiResult<List<Product>>
     suspend fun latest(): ApiResult<List<Product>>
+    suspend fun all(): ApiResult<List<Product>>
     suspend fun replacePhoto(productId: String, photo: File, replaceName: String?): ApiResult<Unit>
     suspend fun loadPhoto(productId: String, imageName: String): ApiResult<ByteArray>
     suspend fun deletePhoto(productId: String, imageName: String): ApiResult<Unit>
@@ -50,6 +51,15 @@ class ContractPendingProductRepository @Inject constructor(
         val server = servers.active() ?: throw IOException("ابتدا نشانی سرور را تنظیم کنید")
         apiClient.retrofitFor(server).create(ZarfolioApi::class.java)
             .searchEtiquettes(status = "available").let { response ->
+                if (!response.isSuccessful) throw IOException(if (response.code() == 401) "ابتدا وارد حساب شوید" else "دریافت اتیکت‌ها انجام نشد (${response.code()})")
+                response.body()?.items.orEmpty().map(EtiquetteDto::toProduct)
+            }
+    }
+
+    override suspend fun all(): ApiResult<List<Product>> = request {
+        val server = servers.active() ?: throw IOException("ابتدا نشانی سرور را تنظیم کنید")
+        apiClient.retrofitFor(server).create(ZarfolioApi::class.java)
+            .searchEtiquettes().let { response ->
                 if (!response.isSuccessful) throw IOException(if (response.code() == 401) "ابتدا وارد حساب شوید" else "دریافت اتیکت‌ها انجام نشد (${response.code()})")
                 response.body()?.items.orEmpty().map(EtiquetteDto::toProduct)
             }

@@ -125,6 +125,17 @@ class ProductSearchViewModel @Inject constructor(
         }
     }
 
+    fun loadAll() {
+        viewModelScope.launch {
+            _loading.value = true
+            when (val result = repository.all()) {
+                is ApiResult.Success -> { _products.value = result.value; _message.value = null }
+                is ApiResult.Failure -> { _products.value = emptyList(); _message.value = result.message }
+            }
+            _loading.value = false
+        }
+    }
+
     fun replacePhoto(productId: String, photo: File, replaceName: String?) {
         viewModelScope.launch {
             _loading.value = true

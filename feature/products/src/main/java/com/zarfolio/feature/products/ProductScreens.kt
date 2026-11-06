@@ -197,9 +197,9 @@ fun AllEtiquettesScreen(viewModel: ProductSearchViewModel = hiltViewModel()) {
     val photoBytes by viewModel.photoBytes.collectAsStateWithLifecycle()
     val loadingPhotos by viewModel.loadingPhotos.collectAsStateWithLifecycle()
     val photoErrors by viewModel.photoErrors.collectAsStateWithLifecycle()
-    LaunchedEffect(Unit) { viewModel.loadLatest() }
+    LaunchedEffect(Unit) { viewModel.loadAll() }
 
-    PullToRefreshBox(isRefreshing = loading, onRefresh = viewModel::loadLatest, modifier = Modifier.fillMaxSize()) {
+    PullToRefreshBox(isRefreshing = loading, onRefresh = viewModel::loadAll, modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier.fillMaxSize(),
