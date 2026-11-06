@@ -25,7 +25,10 @@ data class ServerConfigurationUiState(
     val connectionPassed: Boolean? = null,
     val authenticated: Boolean = false,
     val userName: String? = null,
+    val pingResults: Map<String, ServerPingResult> = emptyMap(),
 )
+
+data class ServerPingResult(val testing: Boolean = false, val latencyMs: Long? = null, val error: String? = null)
 
 @HiltViewModel
 class ServerConfigurationViewModel @Inject constructor(
@@ -67,6 +70,37 @@ class ServerConfigurationViewModel @Inject constructor(
             runCatching { repository.save(item) }
                 .onSuccess { _state.value = _state.value.copy(resultMessage = "تنظیمات سرور ذخیره شد", connectionPassed = true) }
                 .onFailure { _state.value = _state.value.copy(resultMessage = "ذخیرهٔ تنظیمات انجام نشد", connectionPassed = false) }
+        }
+    }
+
+    fun saveProfile(existingId: String?, name: String, rawUrl: String) {
+        val url = ServerUrlValidator.normalize(rawUrl)
+        if (name.isBlank() || url == null) {
+            _state.value = _state.value.copy(resultMessage = if (url == null) "نشانی سرور معتبر نیست" else "نام پروفایل را وارد کنید", connectionPassed = false)
+            return
+        }
+        val old = existingId?.let { id -> _state.value.servers.firstOrNull { it.id == id } }
+        val profile = ServerConfiguration(old?.id ?: UUID.randomUUID().toString(), name.trim(), url, old?.isActive ?: false)
+        viewModelScope.launch {
+            runCatching {
+                repository.save(profile)
+                if (_state.value.servers.isEmpty()) repository.select(profile.id)
+            }.onSuccess {
+                _state.value = _state.value.copy(resultMessage = "پروفایل اتصال ذخیره شد", connectionPassed = true)
+            }.onFailure {
+                _state.value = _state.value.copy(resultMessage = "ذخیرهٔ پروفایل انجام نشد", connectionPassed = false)
+            }
+        }
+    }
+
+    fun testServer(server: ServerConfiguration) {
+        _state.value = _state.value.copy(pingResults = _state.value.pingResults + (server.id to ServerPingResult(testing = true)))
+        viewModelScope.launch {
+            val result = repository.test(server)
+            _state.value = _state.value.copy(pingResults = _state.value.pingResults + (server.id to when (result) {
+                is ApiResult.Success -> ServerPingResult(latencyMs = result.value)
+                is ApiResult.Failure -> ServerPingResult(error = result.message ?: "سرور پاسخ نداد")
+            }))
         }
     }
 

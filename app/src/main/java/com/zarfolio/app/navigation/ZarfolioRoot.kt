@@ -1,6 +1,8 @@
 package com.zarfolio.app.navigation
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CloudSync
 import androidx.compose.material.icons.rounded.DarkMode
@@ -9,6 +11,11 @@ import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,8 +32,12 @@ import com.zarfolio.feature.camera.CameraScreen
 import com.zarfolio.feature.dashboard.DashboardScreen
 import com.zarfolio.feature.dashboard.ServerConfigurationScreen
 import com.zarfolio.feature.dashboard.ServerConfigurationViewModel
+import com.zarfolio.feature.dashboard.AccountSettingsScreen
+import com.zarfolio.feature.dashboard.AppSettingsScreen
 import com.zarfolio.feature.products.ProductSearchScreen
 import com.zarfolio.feature.products.RecentProductsScreen
+import com.zarfolio.feature.products.AllEtiquettesScreen
+import com.zarfolio.feature.products.PriceInquiryScreen
 
 @Composable
 fun ZarfolioRoot(isDarkTheme: Boolean = false, onToggleTheme: () -> Unit = {}) {
@@ -80,30 +91,44 @@ private fun MainNavigation(
     val route = entry?.destination?.route ?: AppDestinations.HOME
     val showBar = route in AppDestinations.bottomTabs || route == AppDestinations.HOME
     Scaffold(topBar = {
-        CenterAlignedTopAppBar(
-            title = { Text("مدیریت اتیکت ها (ویژه اتیکت و قیمت)", style = MaterialTheme.typography.titleMedium) },
+        TopAppBar(
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                    ZarfolioMark(30)
+                    Text("زرفولیو-اتیکت و قیمت", style = MaterialTheme.typography.titleMedium)
+                }
+            },
             actions = { IconButton(onClick = onToggleTheme) { Icon(if (isDarkTheme) Icons.Rounded.LightMode else Icons.Rounded.DarkMode, "تغییر حالت شب و روز") } },
         )
     }, bottomBar = {
         if (showBar) NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
             val tabs = listOf(
+                Triple(AppDestinations.HOME, "خانه", Icons.Rounded.Home),
                 Triple(AppDestinations.PRODUCTS, "جستجو", Icons.Rounded.Search),
-                Triple(AppDestinations.CAMERA, "عکاسی", Icons.Rounded.PhotoCamera),
                 Triple(AppDestinations.RECENT, "آخرین‌ها", Icons.Rounded.Inventory2),
-                Triple(AppDestinations.CONNECTION, "اتصال", Icons.Rounded.CloudSync),
+                Triple(AppDestinations.SETTINGS, "تنظیمات", Icons.Rounded.Settings),
+                Triple(AppDestinations.PROFILE, "پروفایل", Icons.Rounded.Settings),
             )
             tabs.forEach { (destination, label, icon) ->
                 NavigationBarItem(selected = route == destination, onClick = {
                     nav.navigate(destination) { popUpTo(nav.graph.findStartDestination().id) { saveState = true }; launchSingleTop = true; restoreState = true }
-                }, icon = { Icon(icon, contentDescription = label) }, label = { Text(label) })
+                }, icon = {
+                    if (destination == AppDestinations.PROFILE) ProfileAvatar(userName)
+                    else Icon(icon, contentDescription = label)
+                }, label = { Text(label) })
             }
         }
     }) { padding ->
         NavHost(navController = nav, startDestination = AppDestinations.HOME, modifier = Modifier.padding(padding)) {
-            composable(AppDestinations.HOME) { DashboardScreen(userName = userName, onNavigate = { nav.navigate(it) }) }
+            composable(AppDestinations.HOME) { DashboardScreen(onNavigate = { nav.navigate(it) }) }
+            composable(AppDestinations.PROFILE) { AccountSettingsScreen(userName, onOpenSettings = { nav.navigate(AppDestinations.SETTINGS) }) }
+            composable(AppDestinations.SETTINGS) { AppSettingsScreen(servers.firstOrNull { it.isActive }, onConnectionSettings = { nav.navigate(AppDestinations.CONNECTION) }, isDarkTheme = isDarkTheme, onToggleTheme = onToggleTheme) }
+            composable(AppDestinations.PRICE_INQUIRY) { PriceInquiryScreen() }
             composable(AppDestinations.PRODUCTS) { ProductSearchScreen() }
             composable(AppDestinations.CAMERA) { CameraScreen() }
             composable(AppDestinations.RECENT) { RecentProductsScreen() }
+            composable(AppDestinations.WITHOUT_PHOTO) { RecentProductsScreen(onlyWithoutPhoto = true) }
+            composable(AppDestinations.ALL_ETIQUETTES) { AllEtiquettesScreen() }
             composable(AppDestinations.CONNECTION) { ServerConfigurationScreen(onSaved = onChangeServer) }
             composable(AppDestinations.LOGIN) {
                 LoginScreen(
@@ -116,6 +141,21 @@ private fun MainNavigation(
                     onToggleTheme = onToggleTheme,
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun ProfileAvatar(userName: String?) {
+    val initial = userName?.trim()?.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
+    Box(
+        Modifier.size(27.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (initial.isNotEmpty()) {
+            Text(initial, color = MaterialTheme.colorScheme.onPrimaryContainer, fontSize = 12.sp, textAlign = TextAlign.Center)
+        } else {
+            Icon(Icons.Rounded.AccountCircle, contentDescription = "پروفایل", tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
         }
     }
 }

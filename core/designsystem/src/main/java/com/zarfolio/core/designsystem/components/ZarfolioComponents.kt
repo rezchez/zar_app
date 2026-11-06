@@ -48,8 +48,5 @@ fun ZarfolioEmptyState(title: String, detail: String, modifier: Modifier = Modif
 
 @Composable
 fun BrandTopBar() {
-    Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-        ZarfolioMark(42)
-        Column { Text("زر فولیو", style = MaterialTheme.typography.titleLarge); Text("مدیریت اتیکت ها (ویژه اتیکت و قیمت)", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-    }
+    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) { ZarfolioMark(34) }
 }

@@ -6,11 +6,12 @@ import org.junit.Test
 
 class AppDestinationsTest {
     @Test fun allRequiredPagesHaveNavigationDestinations() {
-        assertEquals(setOf("products", "camera", "recent", "connection"), AppDestinations.bottomTabs.toSet())
+        assertEquals(setOf("home", "products", "recent", "settings", "profile"), AppDestinations.bottomTabs.toSet())
         assertTrue(AppDestinations.all.containsAll(AppDestinations.bottomTabs + AppDestinations.HOME + AppDestinations.LOGIN))
+        assertTrue(AppDestinations.all.contains(AppDestinations.ALL_ETIQUETTES))
     }
-    @Test fun bottomNavigationContainsFourUniqueDestinations() {
-        assertEquals(4, AppDestinations.bottomTabs.size)
-        assertEquals(4, AppDestinations.bottomTabs.toSet().size)
+    @Test fun bottomNavigationContainsFiveUniqueDestinations() {
+        assertEquals(5, AppDestinations.bottomTabs.size)
+        assertEquals(5, AppDestinations.bottomTabs.toSet().size)
     }
 }
