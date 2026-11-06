@@ -17,17 +17,20 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 
-private val Doran = FontFamily(Font(R.font.doran_regular, FontWeight.Normal), Font(R.font.doran_bold, FontWeight.Bold))
-private val BodySansSerif = FontFamily.SansSerif
-private val ZarTypography = Typography(
+val Doran = FontFamily(Font(R.font.doran_regular, FontWeight.Normal), Font(R.font.doran_bold, FontWeight.Bold))
+val BodySansSerif = FontFamily.SansSerif
+val ZarTypography = Typography(
     displayLarge = TextStyle(fontFamily = Doran, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 42.sp),
     headlineMedium = TextStyle(fontFamily = Doran, fontWeight = FontWeight.Bold, fontSize = 24.sp, lineHeight = 34.sp),
     titleLarge = TextStyle(fontFamily = Doran, fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 28.sp),
     titleMedium = TextStyle(fontFamily = Doran, fontWeight = FontWeight.Bold, fontSize = 15.sp, lineHeight = 24.sp),
+    titleSmall = TextStyle(fontFamily = Doran, fontWeight = FontWeight.Bold, fontSize = 14.sp, lineHeight = 22.sp),
     bodyLarge = TextStyle(fontFamily = BodySansSerif, fontSize = 15.sp, lineHeight = 27.sp),
     bodyMedium = TextStyle(fontFamily = BodySansSerif, fontSize = 13.sp, lineHeight = 23.sp),
     bodySmall = TextStyle(fontFamily = BodySansSerif, fontSize = 12.sp, lineHeight = 20.sp),
     labelLarge = TextStyle(fontFamily = BodySansSerif, fontWeight = FontWeight.Bold, fontSize = 14.sp, lineHeight = 22.sp),
+    labelMedium = TextStyle(fontFamily = Doran, fontWeight = FontWeight.Bold, fontSize = 12.sp, lineHeight = 16.sp),
+    labelSmall = TextStyle(fontFamily = Doran, fontWeight = FontWeight.Bold, fontSize = 11.sp, lineHeight = 14.sp),
 )
 private val LightColors = lightColorScheme(primary = ZarOrange, onPrimary = androidx.compose.ui.graphics.Color.White,
     primaryContainer = ZarOrange.copy(alpha = .12f), onPrimaryContainer = ZarOrange, secondary = ZarNavy,

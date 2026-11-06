@@ -2,6 +2,7 @@ plugins { id("com.android.library"); id("org.jetbrains.kotlin.android"); id("com
 android { namespace = "com.zarfolio.feature.dashboard"; compileSdk = 36; defaultConfig { minSdk = 26 }; buildFeatures { compose = true } }
 dependencies {
     implementation(project(":core:designsystem")); implementation(project(":core:network")); implementation(project(":core:model")); implementation(project(":core:common")); implementation(project(":core:security"))
+    implementation(project(":feature:products"))
     implementation("com.google.dagger:hilt-android:2.58"); kapt("com.google.dagger:hilt-compiler:2.58")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0"); implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
     val composeBom = platform("androidx.compose:compose-bom:2025.10.00")
